@@ -1,10 +1,10 @@
-Automatic Note-Event Transcription of Indian Folk Music
+## Automatic Note-Event Transcription of Indian Folk Music
 
 A tonic-aware automatic note-event transcription system for Indian folk music. The system takes an audio recording as input and produces a sequence of seven-Swara note events with their onset, offset, duration, and prediction confidence.
 
 The final inference pipeline combines neural fundamental-frequency estimation using CREPE, automatic tonic estimation, tonic-relative pitch representation, a frozen Transformer-based seven-Swara classifier, and temporal event decoding.
 
-Overview
+## Overview
 
 Indian melodic music is performed relative to a recording-specific tonic (Sa). Therefore, directly using absolute frequency as the input representation can make the same Swara appear at different frequency locations across recordings.
 
@@ -45,7 +45,7 @@ Temporal Decoder
      ▼
 Final Note Events
 
-Features
+## Features
 
 The final inference system provides:
 
@@ -106,7 +106,7 @@ Note-Event_Transcription/
 ├── .gitignore
 └── LICENSE
 
-Source Files
+## Source Files
 
 src/audio_frontend.py
 
@@ -148,14 +148,14 @@ src/transcribe.py
 
 The main entry point for the complete transcription pipeline. It connects the audio frontend, frozen Swara classifier, and temporal decoder.
 
-Installation
+## Installation
 
 1. Clone the Repository
 
-git clone <YOUR_GITHUB_REPOSITORY_URL>
+git clone https://github.com/DebankurPaul/Note-Event_Transcription_from_Indian_folk_music.git
 cd Note-Event_Transcription
 
-Replace <YOUR_GITHUB_REPOSITORY_URL> with the URL of this repository.
+Replace (https://github.com/DebankurPaul/Note-Event_Transcription_from_Indian_folk_music.git) with the URL of this repository.
 
 2. Create a Virtual Environment
 
