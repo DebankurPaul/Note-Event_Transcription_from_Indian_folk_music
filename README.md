@@ -1,14 +1,33 @@
-## Automatic Note-Event Transcription of Indian Folk Music
+Automatic Note-Event Transcription of Indian Folk Music
 
-A tonic-aware automatic note-event transcription system for Indian folk music. The system takes an audio recording as input and produces a sequence of seven-Swara note events with their onset, offset, duration, and prediction confidence.
+A tonic-aware automatic note-event transcription system for Indian folk music.
 
-The final inference pipeline combines neural fundamental-frequency estimation using CREPE, automatic tonic estimation, tonic-relative pitch representation, a frozen Transformer-based seven-Swara classifier, and temporal event decoding.
+The system takes an audio recording as input and produces a sequence of
+seven-Swara note events with:
 
-## Overview
+Swara identity
 
-Indian melodic music is performed relative to a recording-specific tonic (Sa). Therefore, directly using absolute frequency as the input representation can make the same Swara appear at different frequency locations across recordings.
+Onset time
 
-This system addresses this problem by automatically estimating the tonic and representing the extracted fundamental-frequency trajectory relative to that tonic.
+Offset time
+
+Duration
+
+Prediction confidence
+
+The final inference pipeline combines CREPE-based F0 extraction,
+automatic tonic estimation, tonic-relative pitch representation, a
+frozen Transformer-based seven-Swara classifier, and temporal event
+decoding.
+
+Overview
+
+Indian melodic music is performed relative to a recording-specific tonic
+(Sa). Therefore, absolute frequency alone is not an appropriate common
+reference across recordings performed at different tonic frequencies.
+
+The proposed pipeline first estimates the tonic and then converts the
+extracted F0 trajectory into a tonic-relative cents representation.
 
 Final Pipeline
 
@@ -45,9 +64,7 @@ Temporal Decoder
      ▼
 Final Note Events
 
-## Features
-
-The final inference system provides:
+Features
 
 Automatic fundamental-frequency extraction using CREPE
 
@@ -77,13 +94,7 @@ Seven Swara Classes
 
 The classifier predicts seven canonical Swara classes:
 
-Sa
-Re
-Ga
-Ma
-Pa
-Dha
-Ni
+Sa  Re  Ga  Ma  Pa  Dha  Ni
 
 Repository Structure
 
@@ -106,56 +117,37 @@ Note-Event_Transcription/
 ├── .gitignore
 └── LICENSE
 
-## Source Files
+Source Files
+
+File
+
+Purpose
 
 src/audio_frontend.py
 
-Performs the audio frontend processing:
-
-Audio
-  ↓
-16-kHz audio
-  ↓
-CREPE F0 extraction
-  ↓
-F0 cleaning / voicing
-  ↓
-Octave-error correction
-  ↓
-Automatic tonic estimation
-  ↓
-Tonic-relative cents
-  ↓
-225-Hz [relative_cents, voiced] features
+Audio standardization, CREPE F0 extraction, F0 cleaning, tonic estimation, and tonic-relative feature generation
 
 src/model.py
 
-Contains the frozen Transformer-based seven-Swara classifier used during inference.
-
-The model receives two features per frame:
-
-[relative_cents, voiced]
-
-and predicts:
-
-Sa / Re / Ga / Ma / Pa / Dha / Ni
+Frozen Transformer-based seven-Swara classifier
 
 src/decoder.py
 
-Converts frame-level Swara predictions into temporally structured note events using the final temporal decoding procedure.
+Converts frame-level Swara predictions into note events
 
 src/transcribe.py
 
-The main entry point for the complete transcription pipeline. It connects the audio frontend, frozen Swara classifier, and temporal decoder.
+Main inference entry point connecting the complete pipeline
 
-## Installation
+Installation
 
 1. Clone the Repository
 
 git clone https://github.com/DebankurPaul/Note-Event_Transcription_from_Indian_folk_music.git
-cd Note-Event_Transcription
 
-Replace (https://github.com/DebankurPaul/Note-Event_Transcription_from_Indian_folk_music.git) with the URL of this repository.
+Then enter the repository:
+
+cd Note-Event_Transcription_from_Indian_folk_music
 
 2. Create a Virtual Environment
 
@@ -164,17 +156,11 @@ Python 3.11 is recommended.
 Windows
 
 python -m venv .venv
-
-Activate the environment:
-
 .venv\Scripts\activate
 
 Linux / macOS
 
 python3 -m venv .venv
-
-Activate the environment:
-
 source .venv/bin/activate
 
 3. Install Dependencies
@@ -183,11 +169,15 @@ pip install -r requirements.txt
 
 Performing Transcription
 
-Once the dependencies are installed and the trained checkpoint is available at:
+The final system requires only:
+
+An input audio recording
+
+The trained model checkpoint
+
+The checkpoint should be located at:
 
 checkpoints/best_model.pt
-
-you can directly transcribe an audio recording.
 
 Basic Command
 
@@ -195,69 +185,57 @@ python src/transcribe.py --audio "path/to/your/audio.mp3" --checkpoint "checkpoi
 
 Example
 
-python src/transcribe.py --audio "data/my_folk_song.mp3" --checkpoint "checkpoints/best_model.pt"
+python src/transcribe.py --audio "my_folk_song.mp3" --checkpoint "checkpoints/best_model.pt"
 
-The system automatically performs:
+The complete inference process is:
 
-Audio loading
-      ↓
-Audio standardization
-      ↓
-CREPE F0 extraction
-      ↓
-Voicing estimation
-      ↓
-Automatic tonic estimation
-      ↓
-Tonic-relative pitch conversion
-      ↓
-225-Hz feature generation
-      ↓
-Transformer Swara classification
-      ↓
-Temporal decoding
-      ↓
-Note-event generation
+Audio
+  ↓
+Audio Standardization
+  ↓
+CREPE F0 Extraction
+  ↓
+F0 Cleaning + Voicing
+  ↓
+Automatic Tonic Estimation
+  ↓
+Tonic-Relative Cents
+  ↓
+225-Hz Feature Generation
+  ↓
+Transformer Swara Classification
+  ↓
+Temporal Decoding
+  ↓
+Note-Event Transcription
 
-No tonic.txt, pitch.txt, or note-event annotation file is required for inference.
+No tonic.txt, pitch.txt, or note-event annotation file is required
+when transcribing a new recording.
 
 Output
 
-The transcription results are automatically saved in the project's outputs/ directory.
+All generated transcription files are automatically saved in:
 
-For an input file such as:
+outputs/
+
+For an input file:
 
 my_folk_song.mp3
 
-the output will be:
+the system generates:
 
 outputs/
 ├── my_folk_song_note_events.csv
 ├── my_folk_song_note_events.json
 └── my_folk_song_transcription_metadata.json
 
-The outputs/ directory is created automatically if it does not already exist.
+The outputs/ directory is created automatically if it does not exist.
 
 CSV Output
 
-The CSV transcription contains the following fields:
+The CSV file contains one row for each predicted note event.
 
-event_id
-swara_id
-swara
-onset
-offset
-duration
-confidence
-
-Example:
-
-event_id,swara_id,swara,onset,offset,duration,confidence
-1,0,Sa,0.000,0.120,0.120,0.91
-2,1,Re,0.120,0.245,0.125,0.87
-3,2,Ga,0.245,0.391,0.146,0.94
-
-Output Fields
+Fields
 
 Field
 
@@ -291,9 +269,17 @@ confidence
 
 Mean prediction confidence associated with the event
 
+Example
+
+event_id,swara_id,swara,onset,offset,duration,confidence
+1,0,Sa,0.000,0.120,0.120,0.91
+2,1,Re,0.120,0.245,0.125,0.87
+3,2,Ga,0.245,0.391,0.146,0.94
+
 JSON Output
 
-The JSON file contains the same note-event information in structured JSON format.
+The JSON file contains the same note-event information in structured
+JSON format.
 
 Example:
 
@@ -327,41 +313,39 @@ Number of predicted events
 
 Frontend processing information
 
-Example filename:
+Example:
 
 my_folk_song_transcription_metadata.json
 
-Using CPU or GPU
+CPU and GPU Inference
 
-The system automatically uses CUDA when a compatible NVIDIA GPU is available.
+The system automatically uses CUDA when a compatible NVIDIA GPU is
+available.
 
 CPU
-
-To explicitly use the CPU:
 
 python src/transcribe.py --audio "song.mp3" --checkpoint "checkpoints/best_model.pt" --device cpu
 
 GPU
 
-To explicitly use the first CUDA GPU:
-
 python src/transcribe.py --audio "song.mp3" --checkpoint "checkpoints/best_model.pt" --device cuda:0
 
-If --device is not specified, the system automatically selects CUDA when available and otherwise uses the CPU.
+If --device is omitted, the system automatically selects CUDA when
+available and otherwise uses the CPU.
 
-Checkpoint
+Model Checkpoint
 
-The inference system uses the frozen trained Swara classifier checkpoint:
+The inference system uses:
 
 checkpoints/best_model.pt
 
-The checkpoint is used only for inference. Training is not required to perform transcription.
+This is the frozen trained seven-Swara Transformer checkpoint.
 
-The checkpoint corresponds to the final seven-Swara Transformer classifier used by the inference pipeline.
+Training is not required to perform transcription.
 
 Input Audio
 
-The system is designed to process common audio formats, including:
+The system supports common audio formats including:
 
 .wav
 .flac
@@ -372,25 +356,29 @@ The input audio is internally standardized before pitch extraction.
 
 Tonic Estimation
 
-A major component of the system is automatic tonic estimation.
+The system automatically estimates the tonic from the pitch information
+extracted from the input recording.
 
-The system does not require the user to provide a separate tonic annotation. Instead, the tonic is estimated directly from the pitch information extracted from the input recording.
+A separate tonic annotation is therefore not required.
 
-The estimated tonic is then used to transform absolute F0 into a tonic-relative cents representation:
+The estimated tonic is used to transform absolute F0 into tonic-relative
+cents:
 
 Absolute F0
-    ↓
+     ↓
 Estimated Sa / Tonic
-    ↓
-Tonic-relative cents
+     ↓
+Tonic-Relative Cents
 
-This allows recordings performed at different absolute tonic frequencies to be represented in a common pitch space.
+This allows recordings performed at different absolute tonic frequencies
+to be represented in a common pitch space.
 
 Swara Classification
 
-The Transformer receives the tonic-normalized pitch representation together with the voicing information.
+The Transformer receives the tonic-normalized pitch representation
+together with voicing information.
 
-For each valid frame, the classifier predicts one of the seven canonical Swaras:
+For each valid frame, it predicts one of:
 
 Sa
 Re
@@ -404,9 +392,8 @@ The frame-level predictions are then passed to the temporal decoder.
 
 Note-Event Formation
 
-Frame-level Swara predictions are not directly treated as final note events.
-
-The temporal decoder processes the frame sequence to produce discrete events.
+Frame-level Swara predictions are converted into temporally structured
+note events.
 
 Each final event is represented as:
 
@@ -418,21 +405,24 @@ Sa   1.20 s   1.68 s   0.48 s
 Re   1.69 s   1.94 s   0.25 s
 Ga   1.96 s   2.41 s   0.45 s
 
-This converts the frame-level classification output into a form suitable for note-event transcription.
+This converts frame-level Swara classification into a discrete
+note-event transcription.
 
 Important Notes
 
 No Ground-Truth Files Required for Inference
 
-The final inference pipeline requires only the input audio and trained model checkpoint.
+The final inference pipeline requires only the input audio and trained
+model checkpoint.
 
-The following files are not required:
+The following are not required for inference:
 
 tonic.txt
 pitch.txt
 note-event annotations
 
-These types of annotations are used during dataset preparation and evaluation, not during normal inference on a new recording.
+These annotations are relevant to dataset preparation and evaluation,
+not normal inference on a new recording.
 
 Seven-Swara Representation
 
@@ -440,13 +430,15 @@ The current classifier predicts seven canonical Swara classes:
 
 Sa, Re, Ga, Ma, Pa, Dha, Ni
 
-It is therefore a seven-Swara transcription system rather than a complete representation of every possible pitch nuance in Indian music.
+It is therefore a seven-Swara transcription system rather than a complete
+representation of every pitch nuance in Indian music.
 
 Limitations
 
-The current system does not explicitly model the complete expressive structure of Indian melodic performance.
+The current system does not explicitly model the complete expressive
+structure of Indian melodic performance.
 
-In particular, the current representation does not fully capture:
+In particular, it does not fully capture:
 
 Detailed Gamaka structures
 
@@ -466,21 +458,26 @@ Evaluation
 
 The final classifier was evaluated on five independent recordings.
 
-The final Phase-31B model achieved a best validation accuracy of approximately:
+The final Phase-31B model achieved a best validation accuracy of:
 
 63.83%
 
-Across the five evaluated recordings, frame-level accuracy varied approximately between:
+Across the five evaluated recordings, frame-level accuracy varied
+approximately between:
 
 60% – 72%
 
-This variation demonstrates that performance depends on the characteristics of the input recording.
+This variation demonstrates that performance depends on the
+characteristics of the input recording.
 
-Detailed frame-level metrics, confusion matrices, note-event evaluation, and computational/resource measurements are reported in the associated research work.
+Detailed frame-level metrics, confusion matrices, note-event evaluation,
+and computational/resource measurements are reported in the associated
+research work.
 
 Research Context
 
-This project focuses on automatic note-event transcription of Indian folk music using:
+This project focuses on automatic note-event transcription of Indian
+folk music using:
 
 Neural pitch extraction
 
@@ -492,7 +489,8 @@ Transformer-based Swara classification
 
 Temporal note-event decoding
 
-The objective is to transform an audio recording into a temporally structured sequence of canonical Swara events.
+The objective is to transform an audio recording into a temporally
+structured sequence of canonical Swara events.
 
 Reproducibility
 
@@ -512,10 +510,14 @@ The final inference pipeline does not require retraining the model.
 
 Citation
 
-If you use this implementation or build upon this work, please cite the associated research paper.
+If you use this implementation or build upon this work, please cite the
+associated research paper.
 
-The research paper contains the complete methodology, experimental setup, results, limitations, and references to the prior work used in the development of the system.
+The research paper contains the complete methodology, experimental setup,
+results, limitations, and references to the prior work used in the
+development of the system.
 
 License
 
-See the LICENSE file for licensing information.
+This project is licensed under the MIT License. See the LICENSE file
+for details.
