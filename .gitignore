@@ -1,7 +1,32 @@
+# Research / development files
+configs/
+inputs/
+notes/
+test_audio/
 
-myvenv/
+create_manifests.py
+scratch_inspect_saraga.py
+
+src/full_execution/
+src/phase1_dataset/
+src/phase2_dataset/
+src/phase3_tonic/
+src/phase4_transcription/
+src/phase5_training/
+src/phase6_training/
+src/phase7_inference/
+src/phase8_evaluation/
+src/phase9_end_to_end/
+src/phase20_audio_frontend/
+src/utils/
+
+# Generated transcription outputs
+outputs/*
+!outputs/.gitkeep
+
+# Python
 __pycache__/
-*.pyc
-data/raw/
-data/processed/
-outputs/
+*.py[cod]
+.venv/
+myvenv/
+data/
