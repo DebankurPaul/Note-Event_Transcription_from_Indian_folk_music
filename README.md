@@ -415,23 +415,6 @@ Detailed frame-level metrics, confusion matrices, note-event evaluation, and com
 
 ---
 
-# Limitations
-
-The current system does not explicitly model the complete expressive structure of Indian melodic performance.
-
-In particular, it does not fully capture:
-
-- Detailed Gamaka structures
-- Continuous melodic ornamentation
-- All microtonal pitch variations
-- Complete Raga grammar
-- Complex polyphonic note structures
-- All performance-specific pitch transitions
-
-The current system should therefore be understood as a **seven-Swara note-event transcription system**, not as a complete symbolic representation of Indian music.
-
----
-
 # Reproducibility
 
 For reproducible inference, use:
